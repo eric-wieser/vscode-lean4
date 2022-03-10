@@ -17,6 +17,8 @@ import { EditorConnection, EditorEvents } from './editorConnection';
 import { Event } from './event';
 import { ServerVersion } from './serverVersion';
 
+declare const __coverage__: any;
+
 function Main(props: {}) {
     const ec = React.useContext(EditorContext);
 
@@ -96,6 +98,7 @@ export function renderInfoview(editorApi: EditorApi, uiElement: HTMLElement): In
         changedCursorLocation: new Event(),
         changedInfoviewConfig: new Event(),
         requestedAction: new Event(),
+        getCodeCoverage: new Event()
     };
 
     // Challenge: write a type-correct fn from `Eventify<T>` to `T` without using `any`
@@ -112,6 +115,12 @@ export function renderInfoview(editorApi: EditorApi, uiElement: HTMLElement): In
         changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
         requestedAction: async action => editorEvents.requestedAction.fire(action),
         getInfoviewHtml: async () => document.body.innerHTML,
+        getCodeCoverage: async () => {
+            if (typeof __coverage__ !== 'undefined'){
+                return __coverage__;
+            }
+            return undefined;
+        }
     };
 
     const ec = new EditorConnection(editorApi, editorEvents);

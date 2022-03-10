@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import { suite } from 'mocha';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { waitForActiveExtension, waitForActiveEditor, waitForInfoViewOpen, waitForHtmlString,
+import { waitForActiveExtension, waitForActiveEditor, waitForInfoViewOpen, writeCoverage,
 	assertStringInInfoview } from '../utils/helpers';
 import { InfoProvider } from '../../../src/infoview';
 import { LeanClientProvider} from '../../../src/utils/clientProvider';
@@ -48,8 +48,10 @@ suite('Multi-Folder Test Suite', () => {
 		const actual = clients.getClients().length
 		assert(actual === 2, "Expected 2 LeanClients to be running, but found " + actual);
 
+		await writeCoverage(info);
 		// make sure test is always run in predictable state, which is no file or folder open
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+
 	}).timeout(60000);
 
 }).timeout(60000);

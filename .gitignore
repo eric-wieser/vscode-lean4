@@ -4,6 +4,7 @@ dist/
 .vs/
 .vscode-test/
 build/
+.nyc_output/
 
 ## Output
 node_modules/

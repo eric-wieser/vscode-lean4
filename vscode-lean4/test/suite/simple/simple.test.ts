@@ -3,7 +3,7 @@ import { suite } from 'mocha';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { waitForActiveExtension, waitForActiveEditor, waitForInfoViewOpen, waitForHtmlString,
-	extractPhrase, findWord, assertStringInInfoview } from '../utils/helpers';
+	extractPhrase, findWord, assertStringInInfoview, writeCoverage } from '../utils/helpers';
 import { InfoProvider } from '../../../src/infoview';
 import { LeanClientProvider} from '../../../src/utils/clientProvider';
 import { LeanInstaller } from '../../../src/utils/leanInstaller';
@@ -75,6 +75,7 @@ suite('Lean3 Basics Test Suite', () => {
 			});
 		}
 
+		await writeCoverage(info);
 		// make sure test is always run in predictable state, which is no file or folder open
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
@@ -92,7 +93,7 @@ suite('Lean3 Basics Test Suite', () => {
 		const doc = await vscode.workspace.openTextDocument(path.join(testsRoot, 'factorial.lean'));
 		await vscode.window.showTextDocument(doc);
 
-		let editor = await waitForActiveEditor();
+		const editor = await waitForActiveEditor();
 
 		const lean = await waitForActiveExtension('leanprover.lean4');
 		assert(lean, 'Lean extension not loaded');
@@ -104,7 +105,7 @@ suite('Lean3 Basics Test Suite', () => {
 			'Info view did not open after 60 seconds');
 
 		const expectedVersion = '5040';  // the factorial function works.
-		let html = await waitForHtmlString(info, expectedVersion);
+		const html = await waitForHtmlString(info, expectedVersion);
 
 		const installer = lean.exports.installer as LeanInstaller;
 		const toolChains = await installer.elanListToolChains(null);
@@ -120,9 +121,9 @@ suite('Lean3 Basics Test Suite', () => {
 			await waitForHtmlString(info, defaultToolChain);
 		}
 
+		await writeCoverage(info);
 		// make sure test is always run in predictable state, which is no file or folder open
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-
 	}).timeout(60000);
 
 	test('Goto definition in a package folder', async () => {
@@ -176,6 +177,7 @@ suite('Lean3 Basics Test Suite', () => {
 		// verify we have a nightly build running in this folder.
 		await assertStringInInfoview(info, 'Lake Version:');
 
+		await writeCoverage(info);
 		// make sure test is always run in predictable state, which is no file or folder open
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 

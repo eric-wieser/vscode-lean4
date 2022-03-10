@@ -1,24 +1,12 @@
 
 import * as assert from 'assert';
-import { privateEncrypt } from 'crypto';
 import * as vscode from 'vscode';
+import {v4 as uuidv4} from 'uuid';
 import { InfoProvider } from '../../../src/infoview';
 import { LeanClient} from '../../../src/leanclient';
 import { DocViewProvider } from '../../../src/docview';
-import * as ps from 'ps-node';
-
-export async function findProcs(name: string) : Promise<ps.Program[]> {
-  // A simple pid lookup
-  return await new Promise<ps.Program[]>((resolve) => {
-    ps.lookup({ command: name }, function(err, resultList ) {
-      if (err) {
-        resolve([]);
-      } else {
-        resolve(resultList);
-      }
-    });
-  });
-}
+import * as fs from 'fs';
+import { resolve, join } from 'path';
 
 export function sleep(ms : number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -88,7 +76,7 @@ export async function waitForInfoViewOpen(infoView: InfoProvider, retries=10, de
     let opened = false;
     console.log('Waiting for InfoView...');
     while (count < retries){
-        const isOpen = await infoView.isOpen();
+        const isOpen = infoView.isOpen();
         if (isOpen) {
             console.log('InfoView is open.');
             return true;
@@ -144,7 +132,7 @@ export async function waitForDocViewHtml(docView: DocViewProvider, toFind : stri
 }
 
 export function extractPhrase(html: string, word: string, terminator: string){
-    let pos = html.indexOf(word);
+    const pos = html.indexOf(word);
     if (pos >= 0){
         let endPos = html.indexOf(terminator, pos);
         if (endPos < 0) {
@@ -169,7 +157,7 @@ export async function restartLeanServer(client: LeanClient, retries=10, delay=10
     let count = 0;
     console.log('restarting lean client ...');
 
-    let stateChanges : string[] = []
+    const stateChanges : string[] = []
     client.stopped(() => { stateChanges.push('stopped'); });
     client.restarted(() => { stateChanges.push('restarted'); });
     client.serverFailed(() => { stateChanges.push('failed'); });
@@ -200,4 +188,24 @@ export async function assertStringInInfoview(infoView: InfoProvider, expectedVer
         console.log(`>>> Found default "${versionString}" in infoview`)
     }
     return html;
+}
+
+declare const __coverage__: any;
+
+function writeCoverageInfo(coverage : any) {
+    if (coverage !== undefined){
+        const root = resolve(__dirname, '..', '..', '..', '..')
+        const tmpd = resolve(root, '.nyc_output')
+        const uuid = uuidv4();
+        fs.writeFileSync(join(tmpd, `${uuid}.json`), JSON.stringify(coverage));
+    }
+}
+
+export async function writeCoverage(infoView: InfoProvider | undefined = undefined) : Promise<void>{
+    if (typeof __coverage__ !== 'undefined'){
+        writeCoverageInfo(__coverage__);
+    }
+    if (infoView) {
+        writeCoverageInfo(await infoView.getCodeCoverage());
+    }
 }

@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 import cheerio = require('cheerio');
 
 import { waitForActiveExtension, waitForActiveEditor, waitForInfoViewOpen, waitForHtmlString,
-	extractPhrase, waitForDocViewHtml } from '../utils/helpers';
+	extractPhrase, waitForDocViewHtml, writeCoverage } from '../utils/helpers';
 import { InfoProvider } from '../../../src/infoview';
 import { DocViewProvider } from '../../../src/docview';
 
@@ -33,7 +33,7 @@ suite('Documentation View Test Suite', () => {
         assert(await waitForInfoViewOpen(info, 60),
 			'Info view did not open after 20 seconds');
 
-		let expectedVersion = 'Hello:';
+		const expectedVersion = 'Hello:';
 		let html = await waitForHtmlString(info, expectedVersion);
 		const versionString = extractPhrase(html, 'Hello:', '<').trim();
 		console.log(`>>> Found "${versionString}" in infoview`)
@@ -68,6 +68,8 @@ suite('Documentation View Test Suite', () => {
         // the example should be active and should be showing this in the info view.
         const exampleOuput = 'Hello, world!';
 		await waitForHtmlString(info, exampleOuput);
+
+		await writeCoverage(info);
 
 		// make sure test is always run in predictable state, which is no file or folder open
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors');

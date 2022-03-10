@@ -333,6 +333,14 @@ export class InfoProvider implements Disposable {
         }
     }
 
+    async getCodeCoverage() : Promise<any> {
+        if (this.webviewPanel) {
+            return this.webviewPanel.api.getCodeCoverage();
+        } else {
+            throw new Error('Cannot retrieve infoview code coverage, infoview is closed.');
+        }
+    }
+
     sleep(ms : number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }

@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { waitForActiveExtension, waitForActiveEditor, waitForInfoViewOpen, waitForHtmlString,
-	extractPhrase, restartLeanServer, assertStringInInfoview } from '../utils/helpers';
+	extractPhrase, restartLeanServer, assertStringInInfoview, writeCoverage } from '../utils/helpers';
 import { InfoProvider } from '../../../src/infoview';
 import { LeanClientProvider} from '../../../src/utils/clientProvider';
 import { LeanInstaller } from '../../../src/utils/leanInstaller';
@@ -52,6 +52,7 @@ suite('Toolchain Test Suite', () => {
 		// make sure test is always run in predictable state, which is no file or folder open
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
+		writeCoverage();
 	}).timeout(60000);
 
 	test('Restart Server', async () => {
@@ -99,6 +100,7 @@ suite('Toolchain Test Suite', () => {
 			// make sure test is always run in predictable state, which is no file or folder open
 			await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 		}
+		writeCoverage();
 	}).timeout(60000);
 
 	test('Select toolchain', async () => {
@@ -146,6 +148,7 @@ suite('Toolchain Test Suite', () => {
 
 		// make sure test is always run in predictable state, which is no file or folder open
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+		writeCoverage();
 	}).timeout(60000);
 
 	test('Edit lean-toolchain version', async () => {
@@ -209,6 +212,8 @@ suite('Toolchain Test Suite', () => {
 
 		// Now make sure the reset works and we can go back to the previous nightly version.
 		await assertStringInInfoview(info, '4.0.0-nightly-');
+
+		await writeCoverage(info);
 
 		// make sure test is always run in predictable state, which is no file or folder open
 		await vscode.commands.executeCommand('workbench.action.closeAllEditors');

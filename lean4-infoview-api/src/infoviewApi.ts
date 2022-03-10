@@ -133,4 +133,10 @@ export interface InfoviewApi {
    * in particular to inspect the page contents and check if the UI is in a correct state.
    */
   getInfoviewHtml(): Promise<string>;
+
+  /**
+   * Return any code coverage information from the infoview webview that may have been
+   * collected if you are running instrumented code.
+   */
+  getCodeCoverage(): Promise<any>;
 }

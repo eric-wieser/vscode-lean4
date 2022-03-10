@@ -1,0 +1,13 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "exclude": [
+    ".vscode-test/**",
+    "node_modules/**",
+    "old"
+  ],
+  "extension": [
+    ".ts",
+    ".tsx"
+  ],
+  "all": true
+}
